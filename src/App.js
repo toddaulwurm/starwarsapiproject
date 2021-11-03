@@ -1,25 +1,51 @@
-import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter,
+} from "react-router-dom";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
+import Form from './components/Form';
+import Noun from './components/Noun';
 
 function App() {
+  const [currentSearch, setCurrentSearch] = useState("")
+  const [categories, setCategories] = useState([])
+  const [data, setData] = useState({})
+  const newSearch = (newSearch) =>{
+    setCurrentSearch(newSearch)
+  }
+  useEffect(() => {
+    axios.get('https://swapi.dev/api/')
+        .then(response => {setCategories(Object.entries(response.data)); console.log(Object.entries(response.data))})
+    }, []);
+
+  useEffect(()=>{
+    if(!currentSearch.length){
+      return
+    }
+    axios.get(currentSearch)
+    .then(response => {setData(response.data)})
+  }, [currentSearch]);
+
+  // function viewSearch(currentSearch){
+  //   return currentSearch
+  // };
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <h1>Search Star Wars API</h1>
+      <Form onNewSearch={newSearch} categories={categories}></Form>
+      <Noun currentSearch={currentSearch} data={data}></Noun>
+    </BrowserRouter>
   );
 }
 
 export default App;
+
+
+
+// const [responseData, setResponseData] = useState(null);
+// useEffect(()=>{
+//     axios.get('https://swapi.dev/api/people/1')
+//         .then(response=>{setResponseData(response.data)})
+// }, []); 
